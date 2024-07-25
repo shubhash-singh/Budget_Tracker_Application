@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Budget Tracker</string>
+    <string name="expense_amount">Amount</string>
+    <string name="expense_description">Item and Quantity</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="income_amount">Income Amount</string>
+    <string name="income_description">Name</string>
+    <string name="add_income">Add Income</string>
+    <string name="show_remaining_balance">Show Remaining Balance</string>
+    <string name="remaining_balance">Remaining Balance:</string>
+    <string name="budget_tracker">Budget Tracker</string>
+    <string name="show_all_expenses">Show all Expenses</string>
+    <string name="amount">Amount</string>
+    <string name="description">Description</string>
+    <string name="date">Date</string>
+    <string name="show_all_incomes">Show all Incomes</string>
+</resources>
