@@ -1,122 +1,90 @@
 package com.example.budgettracker;
 
+
+import android.app.AlertDialog;
 import android.content.Intent;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatActivity;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import androidx.core.content.ContextCompat;
+
+import com.parse.Parse;
+import com.parse.ParseUser;
+
 
 public class MainActivity extends AppCompatActivity {
-
-    private DatabaseHelper dbHelper;
-    private String date;
-    private EditText expenseAmount, expenseDescription;
-    private EditText incomeAmount, incomeDescription;
-    private TextView balanceTextView;
-    Button addExpenseButton, addIncomeButton, viewExpensesButton, viewIncomeButton;
+    Button loginButton, signUpButton;
+    EditText emailEditText, passwordEditText;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login_page);
 
-        dbHelper = new DatabaseHelper(this);
+        Parse.initialize(new Parse.Configuration.Builder(this)
+                .applicationId(getString(R.string.back4app_app_id))
+                .clientKey(getString(R.string.back4app_client_key))
+                .server(getString(R.string.back4app_server_url))
+                .build()
+        );
 
-        // Expense fields
-        expenseAmount = findViewById(R.id.expenseAmount);
-        expenseDescription = findViewById(R.id.expenseDescription);
-        addExpenseButton = findViewById(R.id.addExpenseButton);
+        // setting the status bar to black
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
-        // Income fields
-        incomeAmount = findViewById(R.id.incomeAmount);
-        incomeDescription = findViewById(R.id.incomeDescription);
-        addIncomeButton = findViewById(R.id.addIncomeButton);
 
-        // Balance fields
-        balanceTextView = findViewById(R.id.balanceTextView);
+        loginButton = findViewById(R.id.loginButton);
+        signUpButton = findViewById(R.id.signUpButton);
 
-        // View all field
-        viewExpensesButton = findViewById(R.id.show_all_expenses);
-        viewIncomeButton = findViewById(R.id.show_all_income);
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
 
-        // Get the current date
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy", Locale.ENGLISH);
-            date = LocalDate.now().format(formatter);
+        sp = getSharedPreferences("login",MODE_PRIVATE);
+        if(sp.getBoolean("logged",false)){
+            Intent intent = new Intent(MainActivity.this, AddDataActivity.class);
+            startActivity(intent);
         }
-        balanceTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setRemaingBalance();
-            }
-        });
-        addExpenseButton.setOnClickListener(v -> {
 
-            String str_amount = expenseAmount.getText().toString().trim();
-            String description = expenseDescription.getText().toString().trim();
-            if(str_amount.isEmpty() || description.isEmpty()){
-                Toast.makeText(MainActivity.this, "Fill all fields", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                double amount = Double.parseDouble(str_amount);
-                expenseAmount.setText("");
-                expenseDescription.setText("");
-                dbHelper.addExpense(amount, description, date);
-                Toast.makeText(MainActivity.this, "Expense added", Toast.LENGTH_SHORT).show();
-                setRemaingBalance();
-            }
-        });
+        loginButton.setOnClickListener(v -> {
 
-        addIncomeButton.setOnClickListener(v -> {
-            String str_amount = incomeAmount.getText().toString().trim();
-            String description = incomeDescription.getText().toString().trim();
-            if (str_amount.isEmpty() || description.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Fill all fields", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                double amount = Double.parseDouble(str_amount);
-                incomeAmount.setText("");
-                incomeDescription.setText("");
-                dbHelper.addIncome(amount, description, date);
-                Toast.makeText(MainActivity.this, "Income added", Toast.LENGTH_SHORT).show();
-                setRemaingBalance();
+            try {
+                String userName = emailEditText.getText().toString().trim();
+                String password = passwordEditText.getText().toString().trim();
+                ParseUser.logInInBackground(userName, password, (parseUser, e) -> {
+                    if (parseUser != null) {
+                        sp.edit().putBoolean("logged",true).apply();
+                        Intent intent = new Intent(MainActivity.this, AddDataActivity.class);
+                        startActivity(intent);
+                    }
+                    else{
+                        ParseUser.logOut();
+                        Toast.makeText(this, "Incorrect Username or Password", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }catch (Exception e){
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Error");
+                builder.setMessage(e.getMessage());
+                builder.setPositiveButton("OK", null);
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
-
-
-        viewExpensesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ExpensesActivity.class);
-                startActivity(intent);
-            }
+        signUpButton.setOnClickListener(v -> {
+            // Navigate to the AddUserActivity
+            Intent intent = new Intent(MainActivity.this, AddUserActivity.class);
+            startActivity(intent);
         });
 
-        viewIncomeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, IncomeActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dbHelper.close();
-    }
 
-    @SuppressLint("SetTextI18n")
-    private void setRemaingBalance(){
-        double remainingBalance = dbHelper.getRemainingBalance();
-        balanceTextView.setText("Remaining Balance: " + remainingBalance);
     }
 }
