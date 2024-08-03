@@ -1,19 +1,21 @@
 package com.example.budgettracker;
 
 public class Expense {
-    int id;
+    String  id;
     double amount;
     String description;
     String date;
+    String name;
 
-    public Expense(int id, double amount, String description, String date) {
+    public Expense(String id, double amount, String description, String date, String name) {
         this.id = id;
         this.amount = amount;
         this.description = description;
         this.date = date;
+        this.name = name;
     }
 
-    public int getId() {
+    public String  getId() {
         return id;
     }
 
@@ -27,5 +29,8 @@ public class Expense {
 
     public String getDate() {
         return date;
+    }
+    public String getName() {
+        return name;
     }
 }

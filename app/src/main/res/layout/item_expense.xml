@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="2dp">
+    android:padding="4dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/background_for_add_money"
+            android:background="@drawable/cardview_background"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/amountTextView"
@@ -45,6 +45,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/date"
+                android:textColor="@color/white"
+                android:layout_marginStart="5dp"
+                android:padding="2dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/nameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/added_by"
                 android:textColor="@color/white"
                 android:layout_marginStart="5dp"
                 android:padding="2dp"

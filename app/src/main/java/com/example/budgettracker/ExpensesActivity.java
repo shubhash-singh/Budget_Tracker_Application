@@ -1,16 +1,21 @@
 package com.example.budgettracker;
+
 import android.annotation.SuppressLint;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExpensesActivity extends AppCompatActivity {
-
-    private DatabaseHelper dbHelper;
     ExpenseAdapter expenseAdapter;
     private List<Expense> expenseList;
 
@@ -19,27 +24,38 @@ public class ExpensesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expenses);
 
-        dbHelper = new DatabaseHelper(this);
+        // setting the status bar to black
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        loadExpenses();
+        expenseList = new ArrayList<>();
         expenseAdapter = new ExpenseAdapter(expenseList);
         recyclerView.setAdapter(expenseAdapter);
+
+        loadExpenses();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadExpenses() {
-        expenseList = new ArrayList<>();
-        Cursor cursor = dbHelper.getAllExpenses();
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
-                @SuppressLint("Range") double amount = cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.COLUMN_EXPENSE_AMOUNT));
-                @SuppressLint("Range") String description = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_EXPENSE_DESCRIPTION));
-                @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_EXPENSE_DATE));
-                expenseList.add(new Expense(id, amount, description, date));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
+        ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
+        expenseQuery.findInBackground((expenses, e) -> {
+            if (e == null) {
+                for (ParseObject expense : expenses) {
+                    String id = expense.getObjectId();
+                    double amount = expense.getDouble("Price");
+                    String description = expense.getString("Item_Description");
+                    String date = expense.getCreatedAt().toString();
+                    String name = expense.getString("Added_by");
+                    expenseList.add(new Expense(id, amount, description, date, name));
+                }
+                expenseAdapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

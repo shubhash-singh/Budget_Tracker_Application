@@ -1,5 +1,6 @@
 package com.example.budgettracker;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
-    List<Expense> expenseList;
+    private List<Expense> expenseList;
 
     public ExpenseAdapter(List<Expense> expenseList) {
         this.expenseList = expenseList;
@@ -28,6 +29,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         holder.amountTextView.setText(String.valueOf(expense.getAmount()));
         holder.descriptionTextView.setText(expense.getDescription());
         holder.dateTextView.setText(expense.getDate());
+        holder.nameTextView.setText(expense.getName());
     }
 
     @Override
@@ -39,12 +41,20 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         TextView amountTextView;
         TextView descriptionTextView;
         TextView dateTextView;
+        TextView nameTextView;
 
         public ExpenseViewHolder(@NonNull View itemView) {
             super(itemView);
             amountTextView = itemView.findViewById(R.id.amountTextView);
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             dateTextView = itemView.findViewById(R.id.dateTextView);
+            nameTextView = itemView.findViewById(R.id.nameTextView);
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateExpenseList(List<Expense> newExpenseList) {
+        this.expenseList = newExpenseList;
+        notifyDataSetChanged();
     }
 }
