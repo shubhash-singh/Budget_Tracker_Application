@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeViewHolder> {
-    private List<Expense> incomeList;
+    private List<RecycleVIewPopulate> incomeList;
 
-    public IncomeAdapter(List<Expense> incomeList) {
+    public IncomeAdapter(List<RecycleVIewPopulate> incomeList) {
         this.incomeList = incomeList;
     }
 
@@ -25,7 +25,7 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
 
     @Override
     public void onBindViewHolder(@NonNull IncomeViewHolder holder, int position) {
-        Expense income = incomeList.get(position);
+        RecycleVIewPopulate income = incomeList.get(position);
         holder.amountTextView.setText(String.valueOf(income.getAmount()));
         holder.nameTextView.setText(income.getName());
         holder.dateTextView.setText(income.getDate());
@@ -50,7 +50,7 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateIncomeList(List<Expense> newIncomeList) {
+    public void updateIncomeList(List<RecycleVIewPopulate> newIncomeList) {
         this.incomeList = newIncomeList;
         notifyDataSetChanged();
     }

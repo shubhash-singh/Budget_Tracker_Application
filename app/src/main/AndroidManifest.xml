@@ -16,10 +16,7 @@
         android:theme="@style/Theme.BudgetTracker"
         tools:targetApi="31">
         <activity
-            android:name=".AddUserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AddDataActivity"
+            android:name=".LoadFragment"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -41,12 +38,6 @@
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
 
-        <activity
-            android:name=".IncomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ExpensesActivity"
-            android:exported="false" />
     </application>
 
 </manifest>

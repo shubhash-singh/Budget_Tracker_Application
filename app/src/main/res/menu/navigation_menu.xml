@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon = "@drawable/unfocused_name_icon"
+        android:id="@+id/add_data"
+        android:title="@string/empty_string"
+        />
+
+    <item
+        android:icon = "@drawable/unfocused_list_icon"
+        android:id="@+id/show_data"
+        android:title="@string/empty_string"
+        />
+    <item
+        android:icon = "@drawable/unfocused_username_icon"
+        android:id="@+id/profile"
+        android:title="@string/empty_string"
+        />
+</menu>

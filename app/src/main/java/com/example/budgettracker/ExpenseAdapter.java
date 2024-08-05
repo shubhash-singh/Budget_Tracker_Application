@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
-    private List<Expense> expenseList;
+    private List<RecycleVIewPopulate> recycleVIewPopulateList;
 
-    public ExpenseAdapter(List<Expense> expenseList) {
-        this.expenseList = expenseList;
+    public ExpenseAdapter(List<RecycleVIewPopulate> recycleVIewPopulateList) {
+        this.recycleVIewPopulateList = recycleVIewPopulateList;
     }
 
     @NonNull
@@ -25,16 +25,16 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     @Override
     public void onBindViewHolder(@NonNull ExpenseViewHolder holder, int position) {
-        Expense expense = expenseList.get(position);
-        holder.amountTextView.setText(String.valueOf(expense.getAmount()));
-        holder.descriptionTextView.setText(expense.getDescription());
-        holder.dateTextView.setText(expense.getDate());
-        holder.nameTextView.setText(expense.getName());
+        RecycleVIewPopulate recycleVIewPopulate = recycleVIewPopulateList.get(position);
+        holder.amountTextView.setText(String.valueOf(recycleVIewPopulate.getAmount()));
+        holder.descriptionTextView.setText(recycleVIewPopulate.getDescription());
+        holder.dateTextView.setText(recycleVIewPopulate.getDate());
+        holder.nameTextView.setText(recycleVIewPopulate.getName());
     }
 
     @Override
     public int getItemCount() {
-        return expenseList.size();
+        return recycleVIewPopulateList.size();
     }
 
     public static class ExpenseViewHolder extends RecyclerView.ViewHolder {
@@ -53,8 +53,8 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateExpenseList(List<Expense> newExpenseList) {
-        this.expenseList = newExpenseList;
+    public void updateExpenseList(List<RecycleVIewPopulate> newRecycleVIewPopulateList) {
+        this.recycleVIewPopulateList = newRecycleVIewPopulateList;
         notifyDataSetChanged();
     }
 }

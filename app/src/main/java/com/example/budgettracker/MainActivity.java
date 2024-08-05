@@ -17,8 +17,9 @@ import com.parse.Parse;
 import com.parse.ParseUser;
 
 
+
 public class MainActivity extends AppCompatActivity {
-    Button loginButton, signUpButton;
+    Button loginButton;
     EditText emailEditText, passwordEditText;
     SharedPreferences sp;
 
@@ -41,14 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         loginButton = findViewById(R.id.loginButton);
-        signUpButton = findViewById(R.id.signUpButton);
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
 
         sp = getSharedPreferences("login",MODE_PRIVATE);
         if(sp.getBoolean("logged",false)){
-            Intent intent = new Intent(MainActivity.this, AddDataActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoadFragment.class);
             startActivity(intent);
         }
 
@@ -57,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String userName = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString().trim();
+
+//                boolean isUserNameVerified = false;
+//                Pattern pattern = "^[A-Za-z]+[_]*[0-9A-Za-z]*";
                 ParseUser.logInInBackground(userName, password, (parseUser, e) -> {
                     if (parseUser != null) {
                         sp.edit().putBoolean("logged",true).apply();
-                        Intent intent = new Intent(MainActivity.this, AddDataActivity.class);
+                        Intent intent = new Intent(MainActivity.this, LoadFragment.class);
                         startActivity(intent);
                     }
                     else{
@@ -73,17 +76,11 @@ public class MainActivity extends AppCompatActivity {
                 builder.setTitle("Error");
                 builder.setMessage(e.getMessage());
                 builder.setPositiveButton("OK", null);
-
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
         });
 
-        signUpButton.setOnClickListener(v -> {
-            // Navigate to the AddUserActivity
-            Intent intent = new Intent(MainActivity.this, AddUserActivity.class);
-            startActivity(intent);
-        });
 
 
     }
