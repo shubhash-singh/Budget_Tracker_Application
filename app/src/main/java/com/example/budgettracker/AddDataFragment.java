@@ -18,7 +18,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 public class AddDataFragment extends Fragment {
-
     public double remainingBalance, totalIncome, totalExpense;
     private EditText expenseAmount, expenseDescription;
     private EditText incomeAmount;
@@ -27,8 +26,7 @@ public class AddDataFragment extends Fragment {
     View view;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_add_data, container, false);
 
@@ -53,11 +51,16 @@ public class AddDataFragment extends Fragment {
         addExpenseButton.setOnClickListener(v -> {
 
             String str_amount = expenseAmount.getText().toString().trim();
+            
             String description = expenseDescription.getText().toString().trim();
-            if(str_amount.isEmpty() || description.isEmpty()){
+            String firstLetter = description.substring(0, 1).toUpperCase();
+            String restOfString = description.substring(1);
+            String str_description = firstLetter.concat(restOfString);
+
+            if(str_amount.isEmpty() || str_description.isEmpty()){
                 Toast.makeText(getActivity(), "Fill all fields", Toast.LENGTH_SHORT).show();
             }
-            else {
+            else if (isValidAmount(str_amount)) {
                 double amount = Double.parseDouble(str_amount);
                 expenseAmount.setText("");
                 expenseDescription.setText("");
@@ -67,13 +70,13 @@ public class AddDataFragment extends Fragment {
                 String name = user.getString("Name");
                 try {
                     ParseObject expense = new ParseObject("Expenses");
-                    expense.put("Item_Description", description);
+                    expense.put("Item_Description", str_description);
                     assert name != null;
                     expense.put("Added_by", name);
                     expense.put("Price", amount);
                     expense.save();
                     calcRemainingBalance();
-                    Toast.makeText(getActivity(), "RecycleVIewPopulate Added", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Expense Added", Toast.LENGTH_SHORT).show();
                 } catch (Exception e){
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                     builder.setTitle("Error");
@@ -84,17 +87,17 @@ public class AddDataFragment extends Fragment {
                     dialog.show();
                 }
             }
+            else{
+                Toast.makeText(getActivity(), "Invalid Amount", Toast.LENGTH_SHORT).show();
+            }
         });
 
         addIncomeButton.setOnClickListener(v -> {
             String str_amount = incomeAmount.getText().toString().trim();
-
-
-
             if (str_amount.isEmpty()) {
                 Toast.makeText(getActivity(), "Fill all fields", Toast.LENGTH_SHORT).show();
             }
-            else {
+            else if (isValidAmount(str_amount)){
                 double amount = Double.parseDouble(str_amount);
                 incomeAmount.setText("");
 
@@ -120,6 +123,9 @@ public class AddDataFragment extends Fragment {
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 }
+            }
+            else {
+                Toast.makeText(getContext(), "Invalid Amount", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -154,7 +160,11 @@ public class AddDataFragment extends Fragment {
         });
         incomeQuery.cancel();
         remainingBalance = totalIncome;
-        //balanceTextView.setText("Remaining Balance: " + totalIncome+ " " + totalExpense);
 
+    }
+
+    private boolean isValidAmount(String str){
+        double amount = Double.parseDouble(str);
+        return !(amount < 0) && !(amount > 10000);
     }
 }

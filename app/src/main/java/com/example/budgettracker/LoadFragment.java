@@ -40,7 +40,7 @@ public class LoadFragment extends AppCompatActivity {
                 loadFragment(new AddDataFragment());
             }
             else if(id == R.id.show_data){
-                loadFragment(new ShowDataFragment());
+                loadFragment(new ScreenSlidePager());
             }
             else if(id == R.id.profile){
                 loadFragment(new ProfileFragment());
