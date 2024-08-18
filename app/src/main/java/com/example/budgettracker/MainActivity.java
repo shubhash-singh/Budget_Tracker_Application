@@ -57,9 +57,6 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String userName = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString().trim();
-
-//                boolean isUserNameVerified = false;
-//                Pattern pattern = "^[A-Za-z]+[_]*[0-9A-Za-z]*";
                 ParseUser.logInInBackground(userName, password, (parseUser, e) -> {
                     if (parseUser != null) {
                         sp.edit().putBoolean("logged",true).apply();

@@ -19,6 +19,7 @@ public class ProfileFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_profile, container, false);
 
 
+
         return view;
     }
 }

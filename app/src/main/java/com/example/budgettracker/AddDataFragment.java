@@ -22,7 +22,7 @@ public class AddDataFragment extends Fragment {
     private EditText expenseAmount, expenseDescription;
     private EditText incomeAmount;
     TextView balanceTextView;
-    Button addExpenseButton, addIncomeButton, viewExpensesButton, viewIncomeButton;
+    Button addExpenseButton, addIncomeButton;
     View view;
 
     @Override
@@ -42,9 +42,6 @@ public class AddDataFragment extends Fragment {
         // Balance fields
         balanceTextView = view.findViewById(R.id.balanceTextView);
 
-        // View all field
-        viewExpensesButton = view.findViewById(R.id.show_all_expenses);
-        viewIncomeButton = view.findViewById(R.id.show_all_income);
 
         calcRemainingBalance();
 

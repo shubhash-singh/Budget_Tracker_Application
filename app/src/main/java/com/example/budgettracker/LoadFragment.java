@@ -1,8 +1,12 @@
 package com.example.budgettracker;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,6 +17,8 @@ import com.parse.Parse;
 
 public class LoadFragment extends AppCompatActivity {
     BottomNavigationView navbar;
+    TextView logout;
+    SharedPreferences sp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +38,21 @@ public class LoadFragment extends AppCompatActivity {
 
         navbar = findViewById(R.id.bottom_navigation_view);
         loadFragment(new AddDataFragment());
+        logout = findViewById(R.id.logout_icon);
+        
+        
+        logout.setOnClickListener(v ->{
+            sp = getSharedPreferences("login",MODE_PRIVATE);
+            if(sp.getBoolean("logged",false)){
+                sp.edit().putBoolean("logged",false).apply();
+                Intent intent = new Intent(LoadFragment.this, MainActivity.class);
+                startActivity(intent);
+            }
+            else{
+                Toast.makeText(this, "Log in first !!!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         navbar.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
