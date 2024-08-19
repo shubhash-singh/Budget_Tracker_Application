@@ -65,15 +65,23 @@ public class AddDataFragment extends Fragment {
                 // Getting the Name
                 ParseUser user = ParseUser.getCurrentUser();
                 String name = user.getString("Name");
+                String roomId = user.getString("Room_Id");
                 try {
                     ParseObject expense = new ParseObject("Expenses");
                     expense.put("Item_Description", str_description);
                     assert name != null;
                     expense.put("Added_by", name);
                     expense.put("Price", amount);
-                    expense.save();
-                    calcRemainingBalance();
-                    Toast.makeText(getActivity(), "Expense Added", Toast.LENGTH_SHORT).show();
+                    if (roomId == null){
+                        Toast.makeText(getActivity(), "Please join a room first !!! ", Toast.LENGTH_SHORT).show();
+                    }else{
+                        expense.put("Room_Id", roomId);
+                        expense.save();
+                        calcRemainingBalance();
+                        Toast.makeText(getActivity(), "Expense Added", Toast.LENGTH_SHORT).show();
+                    }
+                    
+                   
                 } catch (Exception e){
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                     builder.setTitle("Error");

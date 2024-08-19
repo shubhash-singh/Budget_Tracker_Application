@@ -76,25 +76,39 @@ public class ShowDataPageFragment extends Fragment {
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
         userQuery.whereEqualTo("Room_Id", roomId);
 
-        ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
-        expenseQuery.whereMatchesQuery("Added_by", userQuery); // Using whereMatchesQuery to match users with the same Room_Id
 
-        expenseQuery.findInBackground((expenses, e) -> {
+
+        userQuery.findInBackground((users, e) -> {
             if (e == null) {
-                for (ParseObject expense : expenses) {
-                    String id = expense.getObjectId();
-                    double amount = expense.getDouble("Price");
-                    String description = expense.getString("Item_Description");
-                    String date = expense.getCreatedAt().toString();
+//                Create a list to store all the users
+                List<String> usernames = new ArrayList<>();
+                for (ParseUser user : users){
+                    usernames.add(user.getString("Name"));
 
-                    ParseUser addedByUser = expense.getParseUser("Added_by"); // Retrieve the user who added the expense
-                    String name = addedByUser != null ? addedByUser.getUsername() : "Unknown";
-
-                    recycleVIewPopulateList.add(new RecycleVIewPopulate(id, amount, description, date, name));
                 }
-                expenseAdapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
+                expenseQuery.whereContainedIn("Added_by", usernames);
+                expenseQuery.orderByDescending("CreatedAt");
+
+                expenseQuery.findInBackground((expenses , e1) ->{
+                    if (e1 == null){
+                        for (ParseObject expense : expenses) {
+                            String id = expense.getObjectId();
+                            double amount = expense.getDouble("Price");
+                            String description = expense.getString("Item_Description");
+                            String date = expense.getCreatedAt().toString();
+                            String name = expense.getString("Added_by");
+
+                            recycleVIewPopulateList.add(new RecycleVIewPopulate(id, amount, description, date, name));
+                        }
+                        expenseAdapter.notifyDataSetChanged();
+                    }
+                    else {
+                        Toast.makeText(getActivity(), e1.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
             }
         });
     }
@@ -113,10 +127,7 @@ public class ShowDataPageFragment extends Fragment {
                     String id = income.getObjectId();
                     double amount = income.getDouble("Price");
                     String date = income.getCreatedAt().toString();
-
-                    ParseUser person = income.getParseUser("Person"); // Retrieve the user associated with the income
-                    String name = person != null ? person.getUsername() : "Unknown";
-
+                    String name = income.getString("Person");
                     incomeList.add(new RecycleVIewPopulate(id, amount, " ", date, name));
                 }
                 incomeAdapter.notifyDataSetChanged();
@@ -129,7 +140,7 @@ public class ShowDataPageFragment extends Fragment {
     @SuppressLint("NotifyDataSetChanged")
     void loadPersonalExpenses(String roomId) {
         ParseQuery<ParseObject> personalExpenseQuery = ParseQuery.getQuery("Expenses");
-        personalExpenseQuery.whereEqualTo("Added_by", ParseUser.getCurrentUser()); // Directly match the current user
+        personalExpenseQuery.whereEqualTo("Added_by", ParseUser.getCurrentUser());
         personalExpenseQuery.whereEqualTo("Room_Id", roomId);
         personalExpenseQuery.orderByDescending("createdAt");
 
