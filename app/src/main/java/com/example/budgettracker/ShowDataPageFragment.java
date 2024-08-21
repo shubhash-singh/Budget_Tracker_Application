@@ -18,15 +18,17 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class ShowDataPageFragment extends Fragment {
 
     private static final String ARG_PAGE_TYPE = "page_type";
 
-    private ExpenseAdapter expenseAdapter, personalExpenseAdapter;
+    private ExpenseAdapter expenseAdapter, personalExpenseAdapter,monthlyExpenseAdapter;
     private List<RecycleVIewPopulate> recycleVIewPopulateList;
-    private IncomeAdapter incomeAdapter;
+    private IncomeAdapter incomeAdapter,personalIncome;
     private List<RecycleVIewPopulate> incomeList;
 
     public static ShowDataPageFragment newInstance(String pageType) {
@@ -61,10 +63,20 @@ public class ShowDataPageFragment extends Fragment {
                 expenseAdapter = new ExpenseAdapter(recycleVIewPopulateList);
                 recyclerView.setAdapter(expenseAdapter);
                 loadExpenses(roomId);
-            } else if ("personalExpense".equals(pageType)) {
+            } else if ("monthlyExpense".equals(pageType)) {
+                monthlyExpenseAdapter = new ExpenseAdapter(recycleVIewPopulateList);
+                recyclerView.setAdapter(monthlyExpenseAdapter);
+                loadMonthlyExpenses(roomId);
+            }
+            else if("personalExpense".equals(pageType)){
                 personalExpenseAdapter = new ExpenseAdapter(recycleVIewPopulateList);
                 recyclerView.setAdapter(personalExpenseAdapter);
-                loadPersonalExpenses(roomId);
+                loadPersonalExpenses();
+            }
+            else if ("personalIncome".equals(pageType)){
+                personalIncome = new IncomeAdapter(recycleVIewPopulateList);
+
+                loadPersonalIncome();
             }
         }
 
@@ -75,8 +87,6 @@ public class ShowDataPageFragment extends Fragment {
     void loadExpenses(String roomId) {
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
         userQuery.whereEqualTo("Room_Id", roomId);
-
-
 
         userQuery.findInBackground((users, e) -> {
             if (e == null) {
@@ -118,42 +128,101 @@ public class ShowDataPageFragment extends Fragment {
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
         userQuery.whereEqualTo("Room_Id", roomId);
 
-        ParseQuery<ParseObject> incomeQuery = ParseQuery.getQuery("Income");
-        incomeQuery.whereMatchesQuery("Person", userQuery); // Same method to match users with the same Room_Id
-
-        incomeQuery.findInBackground((incomes, e) -> {
-            if (e == null) {
-                for (ParseObject income : incomes) {
-                    String id = income.getObjectId();
-                    double amount = income.getDouble("Price");
-                    String date = income.getCreatedAt().toString();
-                    String name = income.getString("Person");
-                    incomeList.add(new RecycleVIewPopulate(id, amount, " ", date, name));
+        userQuery.findInBackground((users, e)->{
+            if (e == null){
+                List<String> usernames = new ArrayList<>();
+                for(ParseUser user : users){
+                    usernames.add(user.getString("Name"));
                 }
-                incomeAdapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+                ParseQuery<ParseObject> incomeQuery = ParseQuery.getQuery("Income");
+                incomeQuery.whereContainedIn("Person", usernames);
+                incomeQuery.orderByDescending("CreatedAt");
+
+                incomeQuery.findInBackground((incomes, e1) -> {
+                    if (e1 == null) {
+                        for (ParseObject income : incomes) {
+                            String id = income.getObjectId();
+                            double amount = income.getDouble("Price");
+                            String date = income.getCreatedAt().toString();
+                            String name = income.getString("Person");
+                            incomeList.add(new RecycleVIewPopulate(id, amount, " ", date, name));
+                        }
+                        incomeAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getActivity(), e1.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    void loadMonthlyExpenses(String roomId) {
+        Calendar calendar = Calendar.getInstance();
+        int currentMonth = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is zero-based
+        int currentYear = calendar.get(Calendar.YEAR);
+
+        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.whereEqualTo("Room_Id", roomId);
+
+        userQuery.findInBackground((users, e) -> {
+            if (e == null) {
+                List<String> usernames = new ArrayList<>();
+                for (ParseUser user : users) {
+                    usernames.add(user.getString("Name"));
+                }
+
+                ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
+                expenseQuery.whereContainedIn("Added_by", usernames);
+
+                expenseQuery.findInBackground((expenses, e1) -> {
+                    if (e1 == null) {
+                        for (ParseObject expense : expenses) {
+                            Date createdAt = expense.getCreatedAt();
+                            Calendar expenseCalendar = Calendar.getInstance();
+                            expenseCalendar.setTime(createdAt);
+
+                            int expenseMonth = expenseCalendar.get(Calendar.MONTH) + 1;
+                            int expenseYear = expenseCalendar.get(Calendar.YEAR);
+
+                            if (expenseMonth == currentMonth && expenseYear == currentYear) {
+                                String id = expense.getObjectId();
+                                double amount = expense.getDouble("Price");
+                                String description = expense.getString("Item_Description");
+                                String date = createdAt.toString();
+                                String name = expense.getString("Added_by");
+
+                                recycleVIewPopulateList.add(new RecycleVIewPopulate(id, amount, description, date, name));
+                            }
+                        }
+                        monthlyExpenseAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getActivity(), e1.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    void loadPersonalExpenses(String roomId) {
-        ParseQuery<ParseObject> personalExpenseQuery = ParseQuery.getQuery("Expenses");
-        personalExpenseQuery.whereEqualTo("Added_by", ParseUser.getCurrentUser());
-        personalExpenseQuery.whereEqualTo("Room_Id", roomId);
-        personalExpenseQuery.orderByDescending("createdAt");
+    void loadPersonalExpenses() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        String currentUserName = currentUser.getString("Name");
 
-        personalExpenseQuery.findInBackground((expenses, e) -> {
+        ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
+        expenseQuery.whereEqualTo("Added_by", currentUserName);
+        expenseQuery.orderByDescending("CreatedAt");
+
+        expenseQuery.findInBackground((expenses, e) -> {
             if (e == null) {
                 for (ParseObject expense : expenses) {
                     String id = expense.getObjectId();
                     double amount = expense.getDouble("Price");
                     String description = expense.getString("Item_Description");
                     String date = expense.getCreatedAt().toString();
-
-                    ParseUser addedByUser = expense.getParseUser("Added_by");
-                    String name = addedByUser != null ? addedByUser.getUsername() : "Unknown";
+                    String name = expense.getString("Added_by");
 
                     recycleVIewPopulateList.add(new RecycleVIewPopulate(id, amount, description, date, name));
                 }
@@ -163,4 +232,32 @@ public class ShowDataPageFragment extends Fragment {
             }
         });
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    void loadPersonalIncome() {
+        ParseUser currentUser = ParseUser.getCurrentUser(); // Get the current logged-in user
+        String currentUserName = currentUser.getString("Name"); // Assuming the 'b  Person' field stores the name of the user
+
+        ParseQuery<ParseObject> incomeQuery = ParseQuery.getQuery("Income");
+        incomeQuery.whereEqualTo("Person", currentUserName);
+        incomeQuery.orderByDescending("CreatedAt");
+
+        incomeQuery.findInBackground((incomes, e) -> {
+            if (e == null) {
+                for (ParseObject income : incomes) {
+                    String id = income.getObjectId();
+                    double amount = income.getDouble("Price");
+                    String date = income.getCreatedAt().toString();
+                    String name = income.getString("Person");
+
+                    incomeList.add(new RecycleVIewPopulate(id, amount, " ", date, name));
+                }
+                personalIncome.notifyDataSetChanged();
+            } else {
+                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
 }

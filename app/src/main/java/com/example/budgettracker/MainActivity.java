@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                         sp.edit().putBoolean("logged",true).apply();
                         Intent intent = new Intent(MainActivity.this, LoadFragment.class);
                         startActivity(intent);
+                        finish();
                     }
                     else{
                         ParseUser.logOut();

@@ -17,6 +17,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AddDataFragment extends Fragment {
     public double remainingBalance, totalIncome, totalExpense;
     private EditText expenseAmount, expenseDescription;
@@ -139,37 +142,61 @@ public class AddDataFragment extends Fragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private void calcRemainingBalance(){
+    private void calcRemainingBalance() {
         remainingBalance = 0;
         totalExpense = 0;
         totalIncome = 0;
-        ParseQuery<ParseObject> incomeQuery = ParseQuery.getQuery("Income");
-        incomeQuery.findInBackground((incomes, e) -> {
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        String currentRoomId = currentUser.getString("Room_Id"); // Get the current user's Room_Id
+
+        // Query for users with the same Room_Id
+        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.whereEqualTo("Room_Id", currentRoomId);
+
+        userQuery.findInBackground((users, e) -> {
             if (e == null) {
-                for (ParseObject income : incomes) {
-                    totalIncome += income.getDouble("Price");
+                List<String> usernames = new ArrayList<>();
+                for (ParseUser user : users) {
+                    usernames.add(user.getString("Name"));
                 }
-                ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
-                expenseQuery.findInBackground((expenses, ef) -> {
-                    if (ef == null) {
-                        for (ParseObject expense : expenses) {
-                            totalIncome -= expense.getDouble("Price");
+
+                // Query for incomes based on users in the same Room_Id
+                ParseQuery<ParseObject> incomeQuery = ParseQuery.getQuery("Income");
+                incomeQuery.whereContainedIn("Person", usernames); // Filter by users in the same Room_Id
+                incomeQuery.findInBackground((incomes, incomeError) -> {
+                    if (incomeError == null) {
+                        for (ParseObject income : incomes) {
+                            totalIncome += income.getDouble("Price");
                         }
+
+                        // Query for expenses based on users in the same Room_Id
+                        ParseQuery<ParseObject> expenseQuery = ParseQuery.getQuery("Expenses");
+                        expenseQuery.whereContainedIn("Added_by", usernames); // Filter by users in the same Room_Id
+                        expenseQuery.findInBackground((expenses, expenseError) -> {
+                            if (expenseError == null) {
+                                for (ParseObject expense : expenses) {
+                                    totalIncome -= expense.getDouble("Price");
+                                }
+                                balanceTextView.setText("Remaining Balance: " + totalIncome);
+                            } else {
+                                Toast.makeText(getActivity(), expenseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getActivity(), incomeError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                    balanceTextView.setText("Remaining Balance: " + totalIncome);
                 });
             } else {
-                Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        incomeQuery.cancel();
-        remainingBalance = totalIncome;
-
     }
+
 
     private boolean isValidAmount(String str){
         double amount = Double.parseDouble(str);
         return !(amount < 0) && !(amount > 10000);
     }
+
 }

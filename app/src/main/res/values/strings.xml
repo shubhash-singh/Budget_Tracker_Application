@@ -40,4 +40,9 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="shubhash_singh">Shubhash Singh</string>
+    <string name="join_room">Join Room</string>
+    <string name="create_room">Create Room</string>
+    <string name="please_join_a_room">Please join a Room</string>
+    <string name="room">Room</string>
 </resources>

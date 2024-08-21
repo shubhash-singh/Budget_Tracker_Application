@@ -47,6 +47,7 @@ public class LoadFragment extends AppCompatActivity {
                 sp.edit().putBoolean("logged",false).apply();
                 Intent intent = new Intent(LoadFragment.this, MainActivity.class);
                 startActivity(intent);
+                finish();
             }
             else{
                 Toast.makeText(this, "Log in first !!!", Toast.LENGTH_SHORT).show();
@@ -73,5 +74,11 @@ public class LoadFragment extends AppCompatActivity {
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout,fragment).commit();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }
