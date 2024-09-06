@@ -85,7 +85,7 @@
                 android:text="@string/new_user_sign_up"
                 android:textColor="@color/white"
                 android:textAlignment="center"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:clickable="true"
                 android:focusable="true"
                 />

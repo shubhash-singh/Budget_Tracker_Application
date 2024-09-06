@@ -45,4 +45,6 @@
     <string name="create_room">Create Room</string>
     <string name="please_join_a_room">Please join a Room</string>
     <string name="room">Room</string>
+    <string name="total_income">Total Income:</string>
+    <string name="total_expenses">Total Expenses: </string>
 </resources>
