@@ -9,6 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabMode="fixed"
+        app:tabTextColor="#D1D1D1"
+        android:scrollbarSize="50dp"
+        app:tabSelectedTextColor="@color/black"
         android:background="@drawable/background_for_navigation_bar"
         app:tabGravity="fill"/>
 

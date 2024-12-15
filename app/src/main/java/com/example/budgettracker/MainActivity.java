@@ -2,7 +2,6 @@ package com.example.budgettracker;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,12 +13,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.budgettracker.database.FireStoreCallback;
-import com.example.budgettracker.database.Login;
-import com.example.budgettracker.database.UserUtils;
+import com.example.budgettracker.CallBack.FireStoreCallback;
+import com.example.budgettracker.DataBase.Login;
+import com.example.budgettracker.DataBase.UserUtils;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 
 public class MainActivity extends AppCompatActivity {

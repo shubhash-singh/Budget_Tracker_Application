@@ -12,6 +12,7 @@ import java.util.List;
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
     private List<RecycleVIewPopulate> recycleVIewPopulateList;
 
+
     public ExpenseAdapter(List<RecycleVIewPopulate> recycleVIewPopulateList) {
         this.recycleVIewPopulateList = recycleVIewPopulateList;
     }
