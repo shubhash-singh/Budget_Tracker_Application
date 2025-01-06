@@ -50,6 +50,7 @@
     <string name="total_expenses">Total Expenses: </string>
     <string name="split_expense">Split Expense</string>
     <string name="profile">Profile</string>
+    <string name="search">Search</string>
 
     <string-array name="dropdown_items">
         <item>Option 1</item>

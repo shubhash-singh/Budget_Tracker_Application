@@ -16,6 +16,9 @@
         android:theme="@style/Theme.BudgetTracker"
         tools:targetApi="31">
         <activity
+            android:name=".SignUpPage"
+            android:exported="false" />
+        <activity
             android:name=".PersonalExpense.PersonalExpenses"
             android:exported="false" />
         <activity

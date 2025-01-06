@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.budgettracker.CallBack.FireStoreCallback;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login {
     private String username, password;
+    private FirebaseAuth auth;
     Context context;
 
     public Login(){
@@ -22,6 +24,7 @@ public class Login {
     }
 
     public void performLogin(FireStoreCallback callback){
+
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")

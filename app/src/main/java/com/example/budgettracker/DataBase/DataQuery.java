@@ -48,7 +48,7 @@ public class DataQuery {
                         .whereEqualTo("Room_Id", userData.get(1))
 //                        .whereEqualTo("Name", "Shubhash Singh")
                         .orderBy("Created_At", Query.Direction.DESCENDING)
-                        .limit(100)
+                        .limit(50)
                         .get()
                         .addOnCompleteListener(task ->{
                             if(task.isSuccessful() && !task.getResult().isEmpty()) {
@@ -89,6 +89,7 @@ public class DataQuery {
                 db.collection("Income")
                         .whereEqualTo("Room_Id", userData.get(1))
                         .orderBy("Created_At",Query.Direction.DESCENDING)
+                        .limit(50)
                         .get()
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful() && !task.getResult().isEmpty()) {
