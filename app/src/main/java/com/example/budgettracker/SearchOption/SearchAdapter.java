@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.budgettracker.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.UserViewHolder> {
@@ -51,9 +52,10 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.UserViewHo
     }
 
     public void setFilteredList(List<Search> filteredList) {
-        this.searchList = filteredList;
+        this.searchList = new ArrayList<>(filteredList); // Avoid referencing external lists
         notifyDataSetChanged();
     }
+
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, amountTextView, dateTextView, descriptionTextView;

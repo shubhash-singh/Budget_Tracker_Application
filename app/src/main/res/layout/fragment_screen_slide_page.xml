@@ -10,11 +10,13 @@
         android:autofillHints=""
         android:hint="@string/search"
         android:background="@drawable/custom_input_background"
-        android:textColorHint="@color/black"
+        android:textColorHint="#959595"
         android:inputType="text"
         android:padding="10dp"
         android:layout_marginTop="5dp"
         android:textColor="@color/black"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="15dp"
         android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchRecycleView"

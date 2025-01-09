@@ -103,7 +103,11 @@ public class ShowDataPageFragment extends Fragment {
             searchEditText.setText(clickedSearch.getItem());
             searchRecycleView.setVisibility(View.GONE);
         });
+        searchRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchRecycleView.setAdapter(searchAdapter);
 
+        fetchSearch();
+        // Set up the TextWatcher for the searchEditText
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -117,7 +121,8 @@ public class ShowDataPageFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
-        fetchSearch();
+
+
         return view;
     }
     private void loadIncome(String username) {
@@ -201,38 +206,44 @@ public class ShowDataPageFragment extends Fragment {
     }
     private void fetchSearch() {
         FirebaseFirestore fdb = FirebaseFirestore.getInstance();
+
         fdb.collection("Expenses")
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        searchList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String item = document.getString("Item");
-                            String name = document.getString("Name");
-                            String amount = document.getDouble("Price").toString();
-                            String date = formatDate(document.getTimestamp("Created_At"));
-
-                            if (name != null && item != null && date != null) {
-                                searchList.add(new Search(amount, item, date, name));
-                            }
-                        }
-                        searchAdapter.notifyDataSetChanged(); // Notify adapter
-                        Log.d("SearchDebug", "Fetched " + searchList.size() + " items");
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        populateSearchList(task.getResult());
                     } else {
-                        Log.e("SearchError", "Failed to fetch users: " + task.getException().getMessage());
+                        Log.e("SearchError", "Failed to fetch data: " + task.getException().getMessage());
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("SearchError", e.getMessage());
-                });
+                .addOnFailureListener(e -> Log.e("SearchError", e.getMessage()));
     }
 
+    private void populateSearchList(Iterable<QueryDocumentSnapshot> documents) {
+        searchList.clear();
+        for (QueryDocumentSnapshot document : documents) {
+            String item = document.getString("Item");
+            String name = document.getString("Name");
+            Double price = document.getDouble("Price");
+            Timestamp createdAt = document.getTimestamp("Created_At");
 
+            if (item != null && name != null && price != null && createdAt != null) {
+                searchList.add(new Search(
+                        price.toString(),
+                        item,
+                        formatDate(createdAt),
+                        name
+                ));
+            }
+        }
+
+        Log.d("FetchSearch", "Fetched " + searchList.size() + " items.");
+        searchAdapter.notifyDataSetChanged();
+    }
 
     private void filterUsers(String query) {
         if (query.isEmpty()) {
-            searchRecycleView.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE); // Show main data when search is empty
+            toggleRecyclerViews(true);
             return;
         }
 
@@ -244,15 +255,24 @@ public class ShowDataPageFragment extends Fragment {
         }
 
         if (!filteredList.isEmpty()) {
-            searchRecycleView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE); // Hide main data during search
             searchAdapter.setFilteredList(filteredList);
+            toggleRecyclerViews(false);
         } else {
-            searchRecycleView.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+            toggleRecyclerViews(true); // Fallback to main data if no matches
         }
+
+        Log.d("FilterUsers", "Filtered list size: " + filteredList.size());
     }
 
+    private void toggleRecyclerViews(boolean showMainRecyclerView) {
+        if (showMainRecyclerView) {
+            searchRecycleView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        } else {
+            searchRecycleView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }
+    }
 
 }
 
