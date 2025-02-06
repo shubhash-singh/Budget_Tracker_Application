@@ -16,7 +16,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 
 public class ScreenSlidePager extends Fragment {
-    private static final int NUM_PAGES = 3;
+    private static final int NUM_PAGES = 2;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,8 +36,8 @@ public class ScreenSlidePager extends Fragment {
 
     private static class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        private final String[] pageTypes = {"income", "expenses", "personalIncome"};
-        private final String[] pageTitles = {"Income", "Expenses", "Personal\nIncomes"};
+        private final String[] pageTypes = {"income", "expenses"};
+        private final String[] pageTitles = {"Income", "Expenses"};
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);

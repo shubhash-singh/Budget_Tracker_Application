@@ -129,7 +129,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="170dp"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/cardview_background_for_expense">
 
@@ -147,7 +147,8 @@
                         android:paddingVertical="15dp"
                         android:text="@string/total_income"
                         android:textColor="@color/black"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:visibility="gone"/>
                     <TextView
                         android:id="@+id/incomeTextView"
                         android:layout_width="wrap_content"
@@ -159,14 +160,16 @@
                         android:text="@string/empty_string"
                         android:textAlignment="textStart"
                         android:textColor="@color/black"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:visibility="gone"/>
 
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="15dp">
+                    android:paddingHorizontal="15dp"
+                    android:visibility="gone">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -216,16 +219,9 @@
                         android:paddingVertical="15dp"
                         android:layout_marginHorizontal="5dp"
                         android:text="@string/empty_string"
-                        android:textColor="@color/black"
+                        android:textColor="#4CAF50"
                         android:textSize="18sp"/>
                 </LinearLayout>
-
-
-
-
-
-
-
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

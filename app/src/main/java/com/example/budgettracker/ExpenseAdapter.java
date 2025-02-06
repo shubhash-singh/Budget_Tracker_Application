@@ -27,7 +27,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
     @Override
     public void onBindViewHolder(@NonNull ExpenseViewHolder holder, int position) {
         RecycleVIewPopulate recycleVIewPopulate = recycleVIewPopulateList.get(position);
-        holder.amountTextView.setText(String.valueOf(recycleVIewPopulate.getAmount()));
+        holder.amountTextView.setText(String.format("-%s", String.valueOf(recycleVIewPopulate.getAmount())));
         holder.descriptionTextView.setText(recycleVIewPopulate.getDescription());
         holder.dateTextView.setText(recycleVIewPopulate.getDate());
         holder.nameTextView.setText(recycleVIewPopulate.getName());

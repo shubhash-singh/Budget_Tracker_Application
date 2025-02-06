@@ -37,7 +37,7 @@ public class ShowDataPageFragment extends Fragment {
 
     private ExpenseAdapter expenseAdapter;
     private List<RecycleVIewPopulate> recycleVIewPopulateList, incomeList;
-    private IncomeAdapter incomeAdapter, personalIncomeAdapter;
+    private IncomeAdapter incomeAdapter;
 
     DataQuery db;
     private EditText searchEditText;
@@ -87,10 +87,6 @@ public class ShowDataPageFragment extends Fragment {
                 recyclerView.setAdapter(expenseAdapter);
                 loadExpenses(username);
 
-            } else if ("personalIncome".equals(pageType)) {
-                personalIncomeAdapter = new IncomeAdapter(incomeList);
-                recyclerView.setAdapter(personalIncomeAdapter);
-                loadPersonalIncome(username);
             }
         }
 
@@ -170,26 +166,6 @@ public class ShowDataPageFragment extends Fragment {
         });
 
     }
-
-    private void loadPersonalIncome(String username){
-        db.personalIncome(username, new QueryCallback() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onSuccess(List<List<String>> data) {
-                incomeList.clear();  // Update this list instead
-                for (List<String> item : data) {
-                    incomeList.add(new RecycleVIewPopulate(item.get(0), Double.parseDouble(item.get(1)), item.get(2), item.get(3), item.get(4)));
-                }
-                personalIncomeAdapter.notifyDataSetChanged();  // Notify incomeAdapter
-            }
-
-            @Override
-            public void onFailure(String message) {
-
-            }
-        });
-    }
-
     public String formatDate(Timestamp timestamp) {
         try {
             // Convert the timestamp string to a Date object

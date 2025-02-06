@@ -2,7 +2,6 @@ package com.example.budgettracker.DataBase;
 
 import com.example.budgettracker.CallBack.FireStoreCallback;
 import com.example.budgettracker.CallBack.GetUserDataCallback;
-import com.example.budgettracker.NotificationSystem.AddNotification;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -14,11 +13,11 @@ import java.util.Map;
 
 public class AddData{
     FirebaseFirestore db;
-    AddNotification notification;
+//    AddNotification notification;
     public AddData(){
 
         db = FirebaseFirestore.getInstance();
-        notification = new AddNotification();
+//        notification = new AddNotification();
     }
     public void addExpense(String description, Double amount, String username, FireStoreCallback callback) {
 
@@ -27,37 +26,16 @@ public class AddData{
 
                 Date date = new Date();
                 Map<String, Object> expenseData = new HashMap<>();
-
                 expenseData.put("Name", userData.get(0));
                 expenseData.put("Room_Id", userData.get(1));
                 expenseData.put("Item", description);
                 expenseData.put("Price", amount);
                 expenseData.put("Created_At", date);
 
-                String notificationTitle = "Expense";
-                String notificationRoomId = userData.get(1);
-                String notificationMessage = "<b>" + userData.get(0) + "</b> bought " + description + " at cost of " + amount;
-
                 db.collection("Expenses")
                         .add(expenseData)
-                        .addOnSuccessListener(expense -> {
-                            notification.addNotification(username, notificationMessage, notificationTitle, notificationRoomId, new AddNotification.NotificationCallback() {
-                                @Override
-                                public void onSuccess(String message) {
-                                    callback.onSuccess("Expense"+message);
-                                }
-
-                                @Override
-                                public void onFailure(String message) {
-                                    callback.onFailure(message);
-                                }
-                            });
-
-                        })
-                        .addOnFailureListener(e -> {
-
-                            callback.onFailure(e.getMessage());
-                        });
+                        .addOnSuccessListener(expense -> callback.onSuccess("Expense added successfully"))
+                        .addOnFailureListener(e -> callback.onFailure(e.getMessage()));
             }
         });
     }
@@ -73,25 +51,9 @@ public class AddData{
                 incomeData.put("Price", amount);
                 incomeData.put("Created_At", date);
 
-                String notificationTitle = "Income";
-                String notificationRoomId = userData.get(1);
-                String notificationMessage = "<b>" + userData.get(0) + "</b> added " + amount;
-
                 db.collection("Income")
                         .add(incomeData)
-                        .addOnSuccessListener( e -> {
-                            notification.addNotification(username, notificationMessage, notificationTitle, notificationRoomId, new AddNotification.NotificationCallback() {
-                                @Override
-                                public void onSuccess(String message) {
-                                    callback.onSuccess("Income"+message);
-                                }
-
-                                @Override
-                                public void onFailure(String message) {
-                                    callback.onFailure(message);
-                                }
-                            });
-                        })
+                        .addOnSuccessListener( e -> callback.onSuccess("Income added Successfully"))
                         .addOnFailureListener( e -> {
                             callback.onFailure("Error while adding Income !!!");
                         });

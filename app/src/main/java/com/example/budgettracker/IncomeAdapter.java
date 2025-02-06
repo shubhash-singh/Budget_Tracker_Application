@@ -26,7 +26,7 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
     @Override
     public void onBindViewHolder(@NonNull IncomeViewHolder holder, int position) {
         RecycleVIewPopulate income = incomeList.get(position);
-        holder.amountTextView.setText(String.valueOf(income.getAmount()));
+        holder.amountTextView.setText(String.format("+%s", String.valueOf(income.getAmount())));
         holder.nameTextView.setText(income.getName());
         holder.dateTextView.setText(income.getDate());
     }
