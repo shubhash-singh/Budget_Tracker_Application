@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "824120536926",
+    "firebase_url": "https://expensex-ce138-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "expensex-ce138",
+    "storage_bucket": "expensex-ce138.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824120536926:android:431c202c9fd0c2823069cf",
+        "android_client_info": {
+          "package_name": "com.example.budgettracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgIlJtvys5vAgXUvdhRj7fXYa7Ea8wT6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824120536926:android:7b51f7f33e53bba43069cf",
+        "android_client_info": {
+          "package_name": "com.example.firebasepushnotification"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgIlJtvys5vAgXUvdhRj7fXYa7Ea8wT6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
