@@ -6,11 +6,11 @@ import android.content.SharedPreferences;
 
 import com.example.budgettracker.CallBack.FireStoreCallback;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login {
     private String username, password;
-    private FirebaseAuth auth;
     Context context;
 
     public Login(){
@@ -33,11 +33,19 @@ public class Login {
                 .limit(1)
                 .get()
                 .addOnCompleteListener(task -> {
+                    String roomId = "";
+                    String name = "";
+                    for(DocumentSnapshot doc : task.getResult()){
+                        roomId = doc.getString("Room_Id");
+                        name = doc.getString("Name");
+                    }
 
                     // Save user info in SharedPreferences after successful login
                     SharedPreferences sp = context.getSharedPreferences("login", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putString("username", username);
+                    editor.putString("roomid", roomId);
+                    editor.putString("name", name);
                     editor.putBoolean("logged", true);  // Mark user as logged in
                     editor.apply();
 
@@ -57,6 +65,9 @@ public class Login {
                         message = "Error getting documents: " + task.getException();
                     }
                     callback.onFailure(message);
+                })
+                .addOnFailureListener(e ->{
+                    callback.onFailure("Login:" + e.getMessage());
                 });
     }
 }

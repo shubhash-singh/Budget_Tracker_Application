@@ -6,13 +6,15 @@ public class RecycleVIewPopulate {
     String description;
     String date;
     String name;
+    String isSettled;
 
-    public RecycleVIewPopulate(String id, double amount, String description, String date, String name) {
+    public RecycleVIewPopulate(String id, double amount, String description, String date, String name, String isSettled) {
         this.id = id;
         this.amount = amount;
         this.description = description;
         this.date = date;
         this.name = name;
+        this.isSettled = isSettled;
     }
 
     public String  getId() {
@@ -32,5 +34,11 @@ public class RecycleVIewPopulate {
     }
     public String getName() {
         return name;
+    }
+    public Boolean isSettled(){
+        return isSettled.equals("true");
+    }
+    public void setIsSettled(String isSettled) {
+        this.isSettled = isSettled;
     }
 }

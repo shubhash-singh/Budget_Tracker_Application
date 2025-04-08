@@ -18,12 +18,10 @@ import com.example.budgettracker.DataBase.UserUtils;
 public class AddDataFragment extends Fragment {
     private EditText expenseAmount, expenseDescription;
     private EditText incomeAmount;
-    TextView balanceTextView, incomeTextView, expenseTextView;
+    TextView balanceTextView, nameOfUserTextView;
     Button addExpenseButton, addIncomeButton;
     View view;
-    String username;
     AddData addData;
-    Double totalIncome, totalExpense;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,9 +29,11 @@ public class AddDataFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_add_data, container, false);
 
         // Initialize the AddData class
-        addData = new AddData();
-        UserUtils userUtils = new UserUtils();
+        addData = new AddData(getContext());
 
+        nameOfUserTextView = view.findViewById(R.id.name_of_user);
+        UserUtils userUtils = new UserUtils();
+        nameOfUserTextView.setText(userUtils.getCurrentUser(requireContext()));
         // RecycleView Populate fields
         expenseAmount = view.findViewById(R.id.expenseAmount);
         expenseDescription = view.findViewById(R.id.expenseDescription);
@@ -45,16 +45,15 @@ public class AddDataFragment extends Fragment {
 
         // Balance fields
         balanceTextView = view.findViewById(R.id.balanceTextView);
-        incomeTextView = view.findViewById(R.id.incomeTextView);
-        expenseTextView = view.findViewById(R.id.expenseTextView);
 
-        username = userUtils.getLoggedInUsername(getContext());
-        calcRemainingBalance(username);
+
+        calcRemainingBalance();
+
         addExpenseButton.setOnClickListener(v -> {
             String str_amount = expenseAmount.getText().toString().trim();
             String description = expenseDescription.getText().toString().trim();
 
-            // Getting 1st char is Caps
+            // Setting 1st char as Caps
             String firstLetter = description.substring(0, 1).toUpperCase();
             String restOfString = description.substring(1);
             String str_description = firstLetter.concat(restOfString);
@@ -68,24 +67,19 @@ public class AddDataFragment extends Fragment {
                 // Adding expense to Firestore
                 try {
 
-                    if(username != null){
-                        addData.addExpense(str_description, amount, username, new FireStoreCallback(){
+                    addData.addExpense(str_description, amount, new FireStoreCallback(){
 
-                            @Override
-                            public void onSuccess(String message) {
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
+                        @Override
+                        public void onSuccess(String message) {
+                            Toast.makeText(getContext(), message + " ", Toast.LENGTH_SHORT).show();
+                        }
 
-                            @Override
-                            public void onFailure(String message) {
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        calcRemainingBalance(username);
-                    } else {
-                        Toast.makeText(getActivity(), "Unable to get username", Toast.LENGTH_SHORT).show();
-                    }
-
+                        @Override
+                        public void onFailure(String message) {
+                            Toast.makeText(getContext(), message+ " ", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    calcRemainingBalance();
                 } catch (Exception e) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                     builder.setTitle("Error");
@@ -110,22 +104,18 @@ public class AddDataFragment extends Fragment {
                 try {
                     double amount = Double.parseDouble(str_amount);
 
-                    if(username != null ){
-                        addData.addIncome(amount, username, new FireStoreCallback() {
-                            @Override
-                            public void onSuccess(String message) {
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
+                    addData.addIncome(amount, new FireStoreCallback() {
+                        @Override
+                        public void onSuccess(String message) {
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        }
 
-                            @Override
-                            public void onFailure(String message) {
-                                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        calcRemainingBalance(username);
-                    } else {
-                        Toast.makeText(getActivity(), "Unable to get username", Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void onFailure(String message) {
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    calcRemainingBalance();
         
 
                 } catch (Exception e) {
@@ -145,31 +135,8 @@ public class AddDataFragment extends Fragment {
         return view;
     }
 
-    private void calcRemainingBalance(String username){
-
-        addData.calcTotalIncome(username, new FireStoreCallback() {
-            @Override
-            public void onSuccess(String message) {
-                incomeTextView.setText(message);
-            }
-
-            @Override
-            public void onFailure(String message) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
-        addData.calcTotalExpense(username, new FireStoreCallback() {
-            @Override
-            public void onSuccess(String message) {
-                expenseTextView.setText(message);
-            }
-
-            @Override
-            public void onFailure(String message) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
-        addData.calcRemainingBalance(username, new FireStoreCallback() {
+    private void calcRemainingBalance(){
+        addData.calcRemainingBalance(new FireStoreCallback() {
             @Override
             public void onSuccess(String message) {
                 balanceTextView.setText(message);

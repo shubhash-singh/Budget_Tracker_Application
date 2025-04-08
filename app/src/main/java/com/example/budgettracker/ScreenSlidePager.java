@@ -36,8 +36,8 @@ public class ScreenSlidePager extends Fragment {
 
     private static class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        private final String[] pageTypes = {"income", "expenses"};
-        private final String[] pageTitles = {"Income", "Expenses"};
+        private final String[] pageTypes = {"income", "expenses","todayExpense"};
+        private final String[] pageTitles = {"Income", "Expenses", "Today"};
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);

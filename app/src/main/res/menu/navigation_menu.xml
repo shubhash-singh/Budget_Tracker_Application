@@ -3,10 +3,14 @@
     <item
         android:icon = "@drawable/unfocused_name_icon"
         android:id="@+id/add_data"
-        android:title="@string/empty_string" />
+        android:title="@string/add_data" />
 
     <item
         android:icon = "@drawable/unfocused_list_icon"
         android:id="@+id/show_data"
-        android:title="@string/empty_string" />
+        android:title="@string/data" />
+    <item
+        android:icon="@drawable/ic_data_analytics"
+        android:id="@+id/data_visualization"
+        android:title="@string/chart"/>
 </menu>

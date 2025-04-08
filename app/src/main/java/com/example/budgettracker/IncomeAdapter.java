@@ -1,16 +1,23 @@
 package com.example.budgettracker;
 
-import android.annotation.SuppressLint;
+import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.budgettracker.DataBase.UserUtils;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.List;
 
 public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeViewHolder> {
     private List<RecycleVIewPopulate> incomeList;
+    private final UserUtils userUtils = new UserUtils();
 
     public IncomeAdapter(List<RecycleVIewPopulate> incomeList) {
         this.incomeList = incomeList;
@@ -26,9 +33,20 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
     @Override
     public void onBindViewHolder(@NonNull IncomeViewHolder holder, int position) {
         RecycleVIewPopulate income = incomeList.get(position);
-        holder.amountTextView.setText(String.format("+%s", String.valueOf(income.getAmount())));
+        holder.amountTextView.setText(String.format("+%s", income.getAmount()));
         holder.nameTextView.setText(income.getName());
         holder.dateTextView.setText(income.getDate());
+
+        if (!income.isSettled()){
+            holder.amountTextView.setBackgroundResource(R.drawable.bg_button);
+        }
+        if (userUtils.getLoggedInUsername(holder.itemView.getContext()).equals("dareme")){
+            holder.amountTextView.setOnClickListener(view -> {
+                if(!income.isSettled()){
+                    markAsSettled(income, holder);
+                }
+            });
+        }
     }
 
     @Override
@@ -49,9 +67,21 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.IncomeView
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void updateIncomeList(List<RecycleVIewPopulate> newIncomeList) {
-        this.incomeList = newIncomeList;
-        notifyDataSetChanged();
+    private void markAsSettled(RecycleVIewPopulate income, IncomeAdapter.IncomeViewHolder holder) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Update Firestore document
+        db.collection("Income")
+                .document(income.getId()) // Assuming you have a method to get the Firestore document ID
+                .update("is_settled", true)
+                .addOnSuccessListener(aVoid -> {
+                    // Update local object
+                    income.setIsSettled("true");
+                    holder.amountTextView.setBackground(new ColorDrawable(ContextCompat.getColor(holder.itemView.getContext(), R.color.white)));
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failure
+                    Log.e("Firestore", "Error updating expense", e);
+                });
     }
 }

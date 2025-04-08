@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.budgettracker.VisualFragment.DataChartFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 
@@ -37,6 +38,7 @@ public class LoadFragment extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
+
         navbar = findViewById(R.id.bottom_navigation_view);
         loadFragment(new AddDataFragment());
         logout = findViewById(R.id.logout_icon);
@@ -56,8 +58,6 @@ public class LoadFragment extends AppCompatActivity {
             }
         });
 
-
-
         navbar.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -66,6 +66,8 @@ public class LoadFragment extends AppCompatActivity {
             }
             else if(id == R.id.show_data){
                 loadFragment(new ScreenSlidePager());
+            } else if (id == R.id.data_visualization) {
+                loadFragment(new DataChartFragment());
             }
             return true;
         });
@@ -81,4 +83,5 @@ public class LoadFragment extends AppCompatActivity {
         super.onBackPressed();
         finish();
     }
+
 }

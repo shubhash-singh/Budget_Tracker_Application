@@ -1,5 +1,8 @@
 package com.example.budgettracker.DataBase;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.example.budgettracker.CallBack.GetUserDataCallback;
 import com.example.budgettracker.CallBack.QueryCallback;
 import com.google.firebase.Timestamp;
@@ -9,177 +12,109 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class DataQuery {
     FirebaseFirestore db;
+    String roomId, username;
+    UserUtils userUtils;
 
-    public DataQuery(){
+    public DataQuery(Context context){
         db = FirebaseFirestore.getInstance();
-    }
+        userUtils = new UserUtils();
+        roomId = userUtils.getCurrentRoomId(context);
+        username = userUtils.getLoggedInUsername(context);
 
-    private void getCurrentUser(String username, GetUserDataCallback callback){
-        List<String> userData = new ArrayList<>();
-        db.collection("users")
-                .whereEqualTo("username", username)
-                .limit(1)
+
+    }
+    public void loadAllExpenses(QueryCallback callback){
+
+        db.collection("Expenses")
+                .whereEqualTo("Room_Id",roomId)
+                .orderBy("Created_At", Query.Direction.DESCENDING)
+                .limit(50)
                 .get()
-                .addOnCompleteListener(user -> {
-                    if(user.isSuccessful()){
-                        if(!user.getResult().isEmpty()){
-                            for (QueryDocumentSnapshot document : user.getResult()) {
-                                userData.add(document.getData().get("Name").toString().trim());
-                                userData.add(document.getData().get("Room_Id").toString().trim());
+                .addOnCompleteListener(task ->{
+                    if(task.isSuccessful() && !task.getResult().isEmpty()) {
+                        List<List<String>> expenseData = new ArrayList<>();
+                        for (QueryDocumentSnapshot expenseQuery : task.getResult()) {
+
+                            String documentId = expenseQuery.getId();
+                            String item = expenseQuery.getString("Item");
+                            String name = expenseQuery.getString("Name");
+                            Double price = expenseQuery.getDouble("Price");
+                            String date = formatDate(expenseQuery.getTimestamp("Created_At"));
+                            String isSettled;
+                            if(expenseQuery.get("is_settled") != null){
+                                isSettled = expenseQuery.get("is_settled").toString();
                             }
+                            else{
+                                isSettled = "true";
+                            }
+
+                            List<String> data = new ArrayList<>();
+                            data.add(documentId);
+                            data.add(String.valueOf(price));
+                            data.add(item);
+                            data.add(date);
+                            data.add(name);
+                            data.add(isSettled);
+
+                            expenseData.add(data);
                         }
+                        callback.onSuccess(expenseData);
                     }
-                    callback.onCallback(userData);
+                }).addOnFailureListener(e ->{
+                    callback.onFailure("Failure in query at: "+e.getMessage());
+                    e.printStackTrace();
                 });
     }
 
-    public void loadAllExpenses(String username, QueryCallback callback){
+    public void loadAllIncome(QueryCallback callback) {
+        db.collection("Income")
+                .whereEqualTo("Room_Id",roomId)
+                .orderBy("Created_At",Query.Direction.DESCENDING)
+                .limit(50)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        List<List<String>> incomeData = new ArrayList<>();
+                        for (QueryDocumentSnapshot incomeQuery : task.getResult()) {
 
-        getCurrentUser(username, userData -> {
-            if(userData.size() == 2){
-                db.collection("Expenses")
-                        .whereEqualTo("Room_Id", userData.get(1))
-//                        .whereEqualTo("Name", "Shubhash Singh")
-                        .orderBy("Created_At", Query.Direction.DESCENDING)
-                        .limit(50)
-                        .get()
-                        .addOnCompleteListener(task ->{
-                            if(task.isSuccessful() && !task.getResult().isEmpty()) {
-                                List<List<String>> expenseData = new ArrayList<>();
-                                for (QueryDocumentSnapshot expenseQuery : task.getResult()) {
+                            String documentId = incomeQuery.getId();  // Document ID
+                            String createdAt = formatDate(incomeQuery.getTimestamp("Created_At"));
+                            String item = "";
+                            String name = incomeQuery.getString("Name");
+                            Double price = incomeQuery.getDouble("Price");
+                            Boolean isSettled = incomeQuery.getBoolean("is_settled");
 
-                                    String documentId = expenseQuery.getId();
-                                    String item = expenseQuery.getString("Item");
-                                    String name = expenseQuery.getString("Name");
-                                    Double price = expenseQuery.getDouble("Price");
-                                    String date = formatDate(expenseQuery.getTimestamp("Created_At"));
-                                    List<String> data = new ArrayList<>();
-                                    data.add(documentId);
-                                    data.add(String.valueOf(price));
-                                    data.add(item);
-                                    data.add(date);
-                                    data.add(name);
-
-                                    expenseData.add(data);
-                                }
-                                callback.onSuccess(expenseData);
+                            List<String> data = new ArrayList<>();
+                            data.add(documentId);
+                            data.add(String.valueOf(price));
+                            data.add(item);
+                            data.add(createdAt);
+                            data.add(name);
+                            if(isSettled != null){
+                                data.add(isSettled.toString());
                             }
-                        }).addOnFailureListener(e ->{
-                            callback.onFailure("Failure in query at: "+e.getMessage());
-                            e.printStackTrace();
-                        });
-
-            }
-            else {
-                callback.onFailure("Unable to get user data");
-            }
-        });
-    }
-
-    public void loadAllIncome(String username, QueryCallback callback) {
-        getCurrentUser(username, userData -> {
-            if (userData.size() == 2) {
-                db.collection("Income")
-                        .whereEqualTo("Room_Id", userData.get(1))
-                        .orderBy("Created_At",Query.Direction.DESCENDING)
-                        .limit(50)
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                List<List<String>> expenseData = new ArrayList<>();
-                                for (QueryDocumentSnapshot incomeQuery : task.getResult()) {
-
-                                    String documentId = incomeQuery.getId();  // Document ID
-                                    String createdAt = formatDate(incomeQuery.getTimestamp("Created_At"));
-                                    String item = "";
-                                    String name = incomeQuery.getString("Name");
-                                    Double price = incomeQuery.getDouble("Price");
-
-                                    List<String> data = new ArrayList<>();
-                                    data.add(documentId);
-                                    data.add(String.valueOf(price));
-                                    data.add(item);
-                                    data.add(createdAt);
-                                    data.add(name);
-
-                                    expenseData.add(data);
-                                }
-                                callback.onSuccess(expenseData);
+                            else{
+                                data.add("false");
                             }
-                        }).addOnFailureListener(e -> {
-                            e.printStackTrace();
-                            callback.onFailure("Failure in query at: "+e.getMessage());
-                        });
-            } else {
-                callback.onFailure("Unable to get user data");
-            }
-        });
+
+                            incomeData.add(data);
+                        }
+                        callback.onSuccess(incomeData);
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("DataQuery", "Load Income :" + e.getMessage());
+                    callback.onFailure("Failure in query at: "+e.getMessage());
+                });
     }
-
-    public void personalIncome(String username, QueryCallback callback){
-        getCurrentUser(username, userData -> {
-            if (userData.size() == 2) {
-
-                // Get the start and end of the current month
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.DAY_OF_MONTH, 1);  // Set to first day of the month
-                Date startOfMonth = calendar.getTime();
-                Timestamp startTimestamp = new Timestamp(startOfMonth);
-
-                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH)); // Last day of the month
-                calendar.set(Calendar.HOUR_OF_DAY, 23);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
-                Date endOfMonth = calendar.getTime();
-                Timestamp endTimestamp = new Timestamp(endOfMonth);
-
-
-                db.collection("Income")
-                        .whereEqualTo("Name", userData.get(0))
-                        .whereEqualTo("Room_Id", userData.get(1))
-//                        .whereGreaterThanOrEqualTo("Created_At", startTimestamp)  // Start of the current month
-//                        .whereLessThanOrEqualTo("Created_At", endTimestamp)
-                        .orderBy("Created_At")
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                List<List<String>> expenseData = new ArrayList<>();
-                                for (QueryDocumentSnapshot incomeQuery : task.getResult()) {
-
-                                    String documentId = incomeQuery.getId();  // Document ID
-                                    String createdAt = formatDate(incomeQuery.getTimestamp("Created_At"));
-                                    String item = "";
-                                    String name = incomeQuery.getString("Name");
-                                    Double price = incomeQuery.getDouble("Price");
-
-                                    List<String> data = new ArrayList<>();
-                                    data.add(documentId);
-                                    data.add(String.valueOf(price));
-                                    data.add(item);
-                                    data.add(createdAt);
-                                    data.add(name);
-
-                                    expenseData.add(data);
-                                }
-                                callback.onSuccess(expenseData);
-                            }
-                        }).addOnFailureListener(e -> {
-                            callback.onFailure("Failure in query at: " + e.getMessage());
-                            e.printStackTrace();
-                        });
-            } else {
-                callback.onFailure("Unable to get user data");
-            }
-        });
-    }
-
 
     public String formatDate(Timestamp timestamp) {
         try {
@@ -191,7 +126,7 @@ public class DataQuery {
             return desiredFormat.format(date);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("QueryData", "Format Date: " + e.getMessage());
             return "Invalid Date";
         }
     }

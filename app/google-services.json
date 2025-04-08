@@ -24,25 +24,6 @@
           "other_platform_oauth_client": []
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:824120536926:android:7b51f7f33e53bba43069cf",
-        "android_client_info": {
-          "package_name": "com.example.firebasepushnotification"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCgIlJtvys5vAgXUvdhRj7fXYa7Ea8wT6c"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
     }
   ],
   "configuration_version": "1"

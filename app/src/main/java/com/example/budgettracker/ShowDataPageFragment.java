@@ -62,7 +62,7 @@ public class ShowDataPageFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        db = new DataQuery();
+        db = new DataQuery(getContext());
         searchEditText = view.findViewById(R.id.searchEditText);
         recycleVIewPopulateList = new ArrayList<>();
         incomeList = new ArrayList<>();
@@ -71,8 +71,6 @@ public class ShowDataPageFragment extends Fragment {
         UserUtils userUtils = new UserUtils();
         String username = userUtils.getLoggedInUsername(getContext());
 
-        // Initialize the Query class
-        DataQuery db = new DataQuery();
 
         if (getArguments() != null) {
             String pageType = getArguments().getString(ARG_PAGE_TYPE);
@@ -86,7 +84,6 @@ public class ShowDataPageFragment extends Fragment {
                 expenseAdapter = new ExpenseAdapter(recycleVIewPopulateList);
                 recyclerView.setAdapter(expenseAdapter);
                 loadExpenses(username);
-
             }
         }
 
@@ -123,13 +120,13 @@ public class ShowDataPageFragment extends Fragment {
     }
     private void loadIncome(String username) {
 
-        db.loadAllIncome(username, new QueryCallback() {
+        db.loadAllIncome(new QueryCallback() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(List<List<String>> data) {
                 incomeList.clear();  // Update this list instead
                 for (List<String> item : data) {
-                    incomeList.add(new RecycleVIewPopulate(item.get(0), Double.parseDouble(item.get(1)), item.get(2), item.get(3), item.get(4)));
+                    incomeList.add(new RecycleVIewPopulate(item.get(0), Double.parseDouble(item.get(1)), item.get(2), item.get(3), item.get(4), item.get(5)));
                 }
                 incomeAdapter.notifyDataSetChanged();  // Notify incomeAdapter
             }
@@ -148,13 +145,13 @@ public class ShowDataPageFragment extends Fragment {
 
     private void loadExpenses(String username){
 
-        db.loadAllExpenses(username, new QueryCallback() {
+        db.loadAllExpenses(new QueryCallback() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onSuccess(List<List<String>> data) {
                 recycleVIewPopulateList.clear(); // Clear previous data
                 for (List<String> item : data) {
-                    recycleVIewPopulateList.add(new RecycleVIewPopulate(item.get(0), Double.parseDouble(item.get(1)), item.get(2), item.get(3), item.get(4)));
+                    recycleVIewPopulateList.add(new RecycleVIewPopulate(item.get(0), Double.parseDouble(item.get(1)), item.get(2), item.get(3), item.get(4), item.get(5)));
                 }
                 expenseAdapter.notifyDataSetChanged();
             }
@@ -172,7 +169,7 @@ public class ShowDataPageFragment extends Fragment {
             Date date = timestamp.toDate();
 
             // Format the date to the desired format: DD-MON-YYYY at HH:MM AM/PM
-            SimpleDateFormat desiredFormat = new SimpleDateFormat("dd-MMM-yyyy 'at' hh:mm a");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat desiredFormat = new SimpleDateFormat("dd-MMM-yyyy 'at' hh:mm a");
             return desiredFormat.format(date);
 
         } catch (Exception e) {
@@ -192,9 +189,10 @@ public class ShowDataPageFragment extends Fragment {
                         Log.e("SearchError", "Failed to fetch data: " + task.getException().getMessage());
                     }
                 })
-                .addOnFailureListener(e -> Log.e("SearchError", e.getMessage()));
+                .addOnFailureListener(e -> Log.e("SearchError", "Search Error"+e.getMessage()));
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void populateSearchList(Iterable<QueryDocumentSnapshot> documents) {
         searchList.clear();
         for (QueryDocumentSnapshot document : documents) {

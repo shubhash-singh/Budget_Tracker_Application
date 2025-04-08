@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "com.example.budgettracker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.budgettracker"
         minSdk = 24
         targetSdk = 34
         versionCode = 2
-        versionName = "2.0.0"
+        versionName = "2.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,20 +42,15 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.recyclerview)
-    implementation(libs.viewpager2)
-    implementation(libs.fragment.ktx)
-    implementation(libs.firebase.inappmessaging)
-    implementation(libs.annotation)
-    implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.common)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    // Import the BoM for the Firebase platform
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.database)
+
+    implementation(libs.mpandroidchart)
+
+    implementation(libs.lottie)
 
 }
